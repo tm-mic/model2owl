@@ -44,10 +44,11 @@ TURTLE_MIME_TYPE:='turtle'
 
 # download saxon library 	
 get-saxon:
-	@echo "Downloading Saxon HE 12.8 from GitHub..."
-	@mkdir -p model2owl/saxon
-	@curl -L -o model2owl/saxon/SaxonHE12-8J.zip https://github.com/Saxonica/Saxon-HE/releases/download/SaxonHE-12-8/SaxonHE12-8J.zip
-	@cd model2owl/saxon && unzip -o SaxonHE12-8J.zip && rm SaxonHE12-8J.zip
+	@echo Installing saxon
+	@mkdir -p ${MODEL2OWL_FOLDER}/saxon
+	@cd ${MODEL2OWL_FOLDER}/saxon  && curl -L -o saxon.zip "https://github.com/Saxonica/Saxon-HE/releases/download/SaxonHE-12-8/SaxonHE12-8J.zip" && unzip saxon.zip && rm -rf saxon.zip
+	@cd ${MODEL2OWL_FOLDER}/saxon && mv saxon-he-12.8.jar saxon.jar
+	@echo 'Saxon path is ${SAXON}'
 
 get-jena-cli-tools:
 	@echo Installing jena-cli-tools
