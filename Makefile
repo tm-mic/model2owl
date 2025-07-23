@@ -5,7 +5,7 @@ ABSOLUTE_MODEL2OWL_FOLDER?=$(shell realpath "${MODEL2OWL_FOLDER}")
 # rdflib version
 RDF_LIB_VERSION?=6.2.0
 #Saxon path
-SAXON_CP=./saxon/*
+SAXON_CP=${ABSOLUTE_MODEL2OWL_FOLDER}/saxon/*
 SAXON_CMD=java -cp "${SAXON_CP}" net.sf.saxon.Transform
 JENA_RIOT_TOOL?=${MODEL2OWL_FOLDER}/jena/apache-jena-4.10.0/bin/riot
 TEMP_FILE=./temp_file.txt
