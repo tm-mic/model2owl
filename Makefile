@@ -5,7 +5,7 @@ ABSOLUTE_MODEL2OWL_FOLDER?=$(shell realpath "${MODEL2OWL_FOLDER}")
 # rdflib version
 RDF_LIB_VERSION?=6.2.0
 #Saxon path
-SAXON?=${MODEL2OWL_FOLDER}/saxon/saxon.jar
+SAXON=./saxon-he-12.8.jar
 JENA_RIOT_TOOL?=${MODEL2OWL_FOLDER}/jena/apache-jena-4.10.0/bin/riot
 TEMP_FILE=./temp_file.txt
 # Glossary output directory
@@ -41,14 +41,6 @@ NAMESPACES_AS_RDFPIPE_ARGS=$(shell ${MODEL2OWL_FOLDER}/scripts/get_namespaces.sh
 RDF_XML_MIME_TYPE:='application/rdf+xml'
 TURTLE_MIME_TYPE:='turtle'
 
-# download saxon library 	
-get-saxon:
-	@echo Installing saxon
-	@mkdir -p ${MODEL2OWL_FOLDER}/saxon
-	@cd ${MODEL2OWL_FOLDER}/saxon  && curl -L -o saxon.zip "https://kumisystems.dl.sourceforge.net/project/saxon/Saxon-HE/10/Java/SaxonHE10-6J.zip" && unzip saxon.zip && rm -rf saxon.zip
-	@cd ${MODEL2OWL_FOLDER}/saxon && mv saxon-he-10.6.jar saxon.jar
-	@echo 'Saxon path is ${SAXON}'
-
 get-jena-cli-tools:
 	@echo Installing jena-cli-tools
 	@mkdir -p ${MODEL2OWL_FOLDER}/jena
@@ -68,7 +60,7 @@ get-widoco:
 ######################################################################################
 # Download, install saxon, xspec, rdflib and other dependencies
 ######################################################################################
-install:  get-saxon create-virtual-env get-rdflib get-widoco
+install:  create-virtual-env get-rdflib get-widoco
 
 ############################ Main tasks ##############################################
 # Run unit_tests
