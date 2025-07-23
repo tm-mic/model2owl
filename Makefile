@@ -5,8 +5,7 @@ ABSOLUTE_MODEL2OWL_FOLDER?=$(shell realpath "${MODEL2OWL_FOLDER}")
 # rdflib version
 RDF_LIB_VERSION?=6.2.0
 #Saxon path
-SAXON_CP=${ABSOLUTE_MODEL2OWL_FOLDER}/saxon/*
-SAXON_CMD=java -cp "${SAXON_CP}" net.sf.saxon.Transform
+SAXON?=${MODEL2OWL_FOLDER}/saxon/saxon.jar
 JENA_RIOT_TOOL?=${MODEL2OWL_FOLDER}/jena/apache-jena-4.10.0/bin/riot
 TEMP_FILE=./temp_file.txt
 # Glossary output directory
@@ -69,7 +68,7 @@ get-widoco:
 ######################################################################################
 # Download, install saxon, xspec, rdflib and other dependencies
 ######################################################################################
-install:  create-virtual-env get-rdflib get-widoco
+install:  get-saxon create-virtual-env get-rdflib get-widoco
 
 ############################ Main tasks ##############################################
 # Run unit_tests
@@ -105,7 +104,7 @@ generate-glossary:
 	@echo Input file path: ${XMI_INPUT_FILE_PATH}
 	@echo Input file name: ${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}
 	@cp -rf ./src/static "${OUTPUT_GLOSSARY_PATH}"
-	@${SAXON_CMD} -s:${XMI_INPUT_FILE_PATH} \
+	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} \
 		-xsl:${MODEL2OWL_FOLDER}/src/html-model-glossary.xsl \
 		-o:${OUTPUT_GLOSSARY_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_glossary.html \
 		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
@@ -128,7 +127,7 @@ generate-convention-report:
 	@echo Input file path: ${XMI_INPUT_FILE_PATH}
 	@echo Input file name: ${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}
 	@cp -rf ./src/static "${OUTPUT_CONVENTION_REPORT_PATH}"
-	@${SAXON_CMD} -s:${XMI_INPUT_FILE_PATH} \
+	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} \
 		-xsl:${MODEL2OWL_FOLDER}/src/html-conventions-report.xsl \
 		-o:${OUTPUT_CONVENTION_REPORT_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_convention_report.html \
 		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
@@ -143,7 +142,7 @@ generate-convention-SVRL-report:
 	@echo Input file path: ${XMI_INPUT_FILE_PATH}
 	@echo Input file name: ${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}
 	@cp -rf ./src/static "${OUTPUT_CONVENTION_REPORT_PATH}"
-	@${SAXON_CMD} -s:${XMI_INPUT_FILE_PATH} \
+	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} \
 		-xsl:${MODEL2OWL_FOLDER}/src/svrl-conventions-report.xsl \
 		-o:${OUTPUT_CONVENTION_REPORT_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_convention_svrl_report.xml \
 		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
@@ -165,7 +164,7 @@ generate-convention-SVRL-report:
 # make owl-core XMI_INPUT_FILE_PATH=/home/mypc/work/model2owl/eNotice_CM.xml OUTPUT_FOLDER_PATH=./my-folder
 owl-core:
 	@make gen-enriched-ns-file
-	@${SAXON_CMD} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/owl-core.xsl \
+	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/owl-core.xsl \
 		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.tmp.rdf \
 		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
@@ -178,7 +177,7 @@ owl-core:
 
 owl-restrictions:
 	@make gen-enriched-ns-file
-	@${SAXON_CMD} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/owl-restrictions.xsl \
+	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/owl-restrictions.xsl \
 		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.tmp.rdf \
 		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
@@ -191,7 +190,7 @@ owl-restrictions:
 
 shacl:
 	@make gen-enriched-ns-file
-	@${SAXON_CMD} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/shacl-shapes.xsl \
+	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/shacl-shapes.xsl \
 		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.tmp.rdf \
 		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
@@ -210,14 +209,14 @@ shacl:
 #   NAMESPACES_USER_XML_FILE_PATH: path to the *.xml file provided by a user
 gen-enriched-ns-file:
 	@mkdir -p ${INTERM_FOLDER_PATH}
-	@${SAXON_CMD} -s:${NAMESPACES_USER_XML_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/xml/enriched-namespaces.xsl \
+	@java -jar ${SAXON} -s:${NAMESPACES_USER_XML_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/xml/enriched-namespaces.xsl \
 		-o:${ENRICHED_NAMESPACES_XML_PATH}
 
 # Combine xmi UML files
 # all files for combine should be in test/test-multi-xmi (or in XMI_MERGED_OUTPUT_FOLDER_PATH)
 merge-xmi:
 	@mkdir -p ${XMI_MERGED_OUTPUT_FOLDER_PATH}
-	@${SAXON_CMD} -s:${FIRST_XMI_TO_BE_MERGED_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/xml/merge-multi-xmi.xsl -o:${XMI_MERGED_OUTPUT_FOLDER_PATH}/${MERGED_XMIS_FILE_NAME}
+	@java -jar ${SAXON} -s:${FIRST_XMI_TO_BE_MERGED_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/xml/merge-multi-xmi.xsl -o:${XMI_MERGED_OUTPUT_FOLDER_PATH}/${MERGED_XMIS_FILE_NAME}
 	@echo Input files to be combined are located at the directory containing this input file: ${FIRST_XMI_TO_BE_MERGED_FILE_PATH} under directory ${MERGE_XMIS_FOLDER_NAME}
 	@ls -lh ${MERGE_XMIS_FOLDER_NAME}
 	@echo 
@@ -321,10 +320,9 @@ validate-rdf-file:
 #make generate-html-docs-from-rdf WIDOCO_RDF_INPUT_FILE_PATH=../Documents/model2owl-2023/owl-core.rdf WIDOCO_OUTPUT_FOLDER_PATH=core-html
 generate-html-docs-from-rdf: get-widoco
 	@echo ${WIDOCO_RDF_INPUT_FILE_PATH}
-	@${SAXON_CMD} widoco/widoco.jar -ontFile ${WIDOCO_RDF_INPUT_FILE_PATH} -outFolder ${WIDOCO_OUTPUT_FOLDER_PATH}  -getOntologyMetadata -uniteSections -webVowl
+	@java -jar widoco/widoco.jar -ontFile ${WIDOCO_RDF_INPUT_FILE_PATH} -outFolder ${WIDOCO_OUTPUT_FOLDER_PATH}  -getOntologyMetadata -uniteSections -webVowl
 
 SHELL=/bin/bash -o pipefail
 BUILD_PRINT = \e[1;34mSTEP:
-
 
 
