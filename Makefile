@@ -45,8 +45,8 @@ TURTLE_MIME_TYPE:='turtle'
 get-saxon:
 	@echo Installing saxon
 	@mkdir -p ${MODEL2OWL_FOLDER}/saxon
-	@cd ${MODEL2OWL_FOLDER}/saxon  && curl -L -o saxon.zip "https://kumisystems.dl.sourceforge.net/project/saxon/Saxon-HE/10/Java/SaxonHE10-6J.zip" && unzip saxon.zip && rm -rf saxon.zip
-	@cd ${MODEL2OWL_FOLDER}/saxon && mv saxon-he-10.6.jar saxon.jar
+	@cd ${MODEL2OWL_FOLDER}/saxon  && curl -L -o saxon.zip "https://github.com/Saxonica/Saxon-HE/releases/download/SaxonHE-12-8/SaxonHE12-8J.zip" && unzip saxon.zip && rm -rf saxon.zip
+	@cd ${MODEL2OWL_FOLDER}/saxon && mv saxon-he-12.8.jar saxon.jar
 	@echo 'Saxon path is ${SAXON}'
 
 get-jena-cli-tools:
